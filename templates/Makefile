@@ -6,7 +6,11 @@ SRC=$(PROBLEM).cpp
 TEST=
 
 build:
-	@g++ -Wall -O2 -pipe -o $(PROBLEM) $(SRC)
+	@mkdir -p bin
+	@g++ -Wall -O2 -pipe -o bin/$(PROBLEM) $(SRC)
 
 run: build
-	@../test.sh $(PROBLEM) $(TEST)
+	@../test.sh bin/$(PROBLEM) $(TEST)
+
+clean:
+	rm -f bin/$(PROBLEM)
