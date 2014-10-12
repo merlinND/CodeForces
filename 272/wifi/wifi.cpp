@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+#include <iomanip>
 #include <vector>
 // #include <bits/stdc++.h>
 using namespace std;
@@ -60,7 +60,8 @@ int main () {
       correct++;
   }
 
-  cout << correct / (float)potentialPositions.size() << endl;
+  cout << fixed << setprecision(12);
+  cout << correct / (double)potentialPositions.size() << endl;
 
 	return 0;
 }
