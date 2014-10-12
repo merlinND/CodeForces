@@ -5,11 +5,13 @@ if( [[ $# -ge 2 ]] ) then
 	cat output$2;
   echo "----- Diff -----";
   diff output$2 sample$2.out;
+  rm output$2;
 else
   # Default test
   ./$1 < sample.in > output;
   cat output;
   echo "----- Diff -----";
   diff output sample.out;
+  rm output;
 fi;
 
