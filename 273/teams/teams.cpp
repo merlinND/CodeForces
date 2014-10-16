@@ -36,18 +36,18 @@ int main () {
 
   // Forms teams of one until we can make make teams of more players
   // The players in teams of 1 become useless
-  float r;
-  do {
-    r = (n / (float)m);
-    if(r < 2.f) {
-      n--;
-      m--;
-    }
-  } while(r < 2.f);
-
-  ll int uniformTeamSize = ceil(r);
-  ll int excess = n - (m - 1) * uniformTeamSize;
-  minFriendships = (m - 1) * friendshipsCreated(uniformTeamSize) + friendshipsCreated(excess);
+  ll int uniformTeamSize = ceil(n / (float)m);
+  ll int projectedPlayers = (m - 1) * uniformTeamSize;
+  // We have enough players to make mostly teams of 2 or more
+  if(projectedPlayers < n) {
+    ll int excess = n - projectedPlayers;
+    minFriendships = (m - 1) * friendshipsCreated(uniformTeamSize) + friendshipsCreated(excess);
+  }
+  // Otherwise, form teams of 1 until it becomes possible
+  else {
+    ll int teamsOfOne = (m * uniformTeamSize) - n;
+    minFriendships = (m - teamsOfOne) * friendshipsCreated(uniformTeamSize);
+  }
 
   cout << minFriendships << " " << maxFriendships << endl;
   return 0;
