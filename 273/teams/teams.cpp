@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include <vector>
 // #include <bits/stdc++.h>
 using namespace std;
@@ -32,10 +33,21 @@ int main () {
 
   // All teams of size (n / m)  (integer division)
   // (and maybe one last team to take the excess players)
-  ll int uniformTeamSize = (n / m);
-  ll int excess = n - m * uniformTeamSize;
-  minFriendships = (m - 1) * friendshipsCreated(uniformTeamSize);
-  minFriendships += friendshipsCreated(uniformTeamSize + excess);
+
+  // Forms teams of one until we can make make teams of more players
+  // The players in teams of 1 become useless
+  float r;
+  do {
+    r = (n / (float)m);
+    if(r < 2.f) {
+      n--;
+      m--;
+    }
+  } while(r < 2.f);
+
+  ll int uniformTeamSize = ceil(r);
+  ll int excess = n - (m - 1) * uniformTeamSize;
+  minFriendships = (m - 1) * friendshipsCreated(uniformTeamSize) + friendshipsCreated(excess);
 
   cout << minFriendships << " " << maxFriendships << endl;
   return 0;
