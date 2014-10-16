@@ -31,13 +31,14 @@ int main () {
   // One huge team with most players, (m - 1) teams of 1 creating zero friendships
   maxFriendships = friendshipsCreated(n - m + 1);
 
-  // All teams of size (n / m)  (integer division)
-  // (and maybe one last team to take the excess players)
+  ll int uniformTeamSize = n / m;
+  // We do this to avoid using floating point numbers
+  if(m * uniformTeamSize < n)
+    uniformTeamSize ++;
 
-  // Forms teams of one until we can make make teams of more players
-  // The players in teams of 1 become useless
-  ll int uniformTeamSize = ceil(n / (float)m);
   ll int projectedPlayers = (m - 1) * uniformTeamSize;
+  // General case: all teams of size (n / m)  (integer division)
+  // (and maybe one last team to take the excess players)
   // We have enough players to make mostly teams of 2 or more
   if(projectedPlayers < n) {
     ll int excess = n - projectedPlayers;
