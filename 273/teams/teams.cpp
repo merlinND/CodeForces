@@ -16,6 +16,27 @@ using namespace std;
 #define FOREACH(i,t) for (__typeof(t.begin()) i=t.begin(); i!=t.end(); i++)
 #define fi first
 #define se second
+
+ll int friendshipsCreated(ll int teamSize) {
+  return (teamSize * (teamSize - 1) / 2);
+}
+
 int main () {
+  ll int minFriendships, maxFriendships;
+  ll int n, m;
+  cin >> n;
+  cin >> m;
+
+  // One huge team with most players, (m - 1) teams of 1 creating zero friendships
+  maxFriendships = friendshipsCreated(n - m + 1);
+
+  // All teams of size (n / m)  (integer division)
+  // (and maybe one last team to take the excess players)
+  ll int uniformTeamSize = (n / m);
+  ll int excess = n - m * uniformTeamSize;
+  minFriendships = (m - 1) * friendshipsCreated(uniformTeamSize);
+  minFriendships += friendshipsCreated(uniformTeamSize + excess);
+
+  cout << minFriendships << " " << maxFriendships << endl;
   return 0;
 }
