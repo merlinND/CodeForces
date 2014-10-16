@@ -18,12 +18,28 @@ using namespace std;
 #define fi first
 #define se second
 
-int main () {
-  ll int r, g, b, t = 0;
-  cin >> r;
-  cin >> g;
-  cin >> b;
+bool shouldContinue(ll int r, ll int g, ll int b) {
+  return !(r == g && g == b)
+      && (r >= 0 && g >= 0 && g >= 0)
+      && (r + g + b >= 3);
+}
 
+int main () {
+  ll int t = 0;
+  ll int b[3];
+  cin >> b[0];
+  cin >> b[1];
+  cin >> b[2];
+
+  // Greedy strategy: use the excess balloons in priority
+  while(shouldContinue(b[0], b[1], b[2])) {
+    // WARNING: edge cases r < 0
+    // TODO
+  }
+
+  // We have the same quantity of each balloon left, we can just decorate all tables
+  // the same way.
+  t += b[0];
 
   cout << t << endl;
   return 0;
