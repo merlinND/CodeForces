@@ -18,5 +18,21 @@ using namespace std;
 #define se second
 
 int main () {
+  int n, k, a;
+  cin >> n; cin >> k;
+  vi heights;
+  FOR(i, n) {
+    cin >> a;
+    heights.pb(a);
+  }
+
+  int diff = 1, movesUsed = k;
+  vector<pii> moves;
+  moves.pb(mp(3, 5));
+
+  cout << diff << " " << movesUsed << endl;
+  FOREACH(move, moves) {
+    cout << move->fi << " " << move->se << endl;
+  }
   return 0;
 }
