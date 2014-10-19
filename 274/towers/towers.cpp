@@ -26,13 +26,16 @@ int main () {
     heights.pb(a);
   }
 
-  int diff = 1, movesUsed = k;
-  vector<pii> moves;
-  moves.pb(mp(3, 5));
+  int diff, movesUsed = 0;
+  // List of Move => number of repetitions
+  vector<pair<pii, int> > moves;
+  moves.pb(mp(mp(3, 3), 5));
 
   cout << diff << " " << movesUsed << endl;
   FOREACH(move, moves) {
-    cout << move->fi << " " << move->se << endl;
+    FOR(i, move->se) {
+      cout << move->fi.fi << " " << move->fi.se << endl;
+    }
   }
   return 0;
 }
