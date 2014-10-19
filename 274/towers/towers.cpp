@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <queue>
 // #include <bits/stdc++.h>
 using namespace std;
 #define REP(i,a,b) for (int i = (a); i <= (b); ++i)
@@ -20,21 +22,31 @@ using namespace std;
 int main () {
   int n, k, a;
   cin >> n; cin >> k;
-  vi heights;
+  vi towers;
+  // Note that `lowest` contains negative heights
+  priority_queue<int> highest, lowest;
   FOR(i, n) {
     cin >> a;
-    heights.pb(a);
+    towers.pb(a);
+    highest.push(a);
+    lowest.push(-a);
   }
 
   int diff, movesUsed = 0;
-  // List of Move => number of repetitions
-  vector<pair<pii, int> > moves;
-  moves.pb(mp(mp(3, 3), 5));
+  vector<pii> moves;
 
-  cout << diff << " " << movesUsed << endl;
+  // @warning Edge case where the minimum difference is 1
+  while(moves.size() < k && diff > 0) {
+    int top = highest.top();
+    int bottom = - lowest.top();
+    diff = top - bottom;
+    moves.pb(mp(top, bottom)); // Wrong, we should indicate the indices
+  }
+
+  cout << diff << " " << moves.size() << endl;
   FOREACH(move, moves) {
     FOR(i, move->se) {
-      cout << move->fi.fi << " " << move->fi.se << endl;
+      cout << move->fi << " " << move->fi << endl;
     }
   }
   return 0;
