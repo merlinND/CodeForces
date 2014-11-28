@@ -1,17 +1,17 @@
 #!/bin/bash
 
 if( [[ $# -ge 2 ]] ) then
-	./$1 < sample$2.in > output$2;
-	cat output$2;
+	./bin/$1 < $1$2.in > $1$2.run;
+	cat $1$2.run;
   echo "----- Diff -----";
-  diff output$2 sample$2.out;
-  rm output$2;
+  diff $1$2.run $1$2.out;
+  rm $1$2.run;
 else
   # Default test
-  ./$1 < sample.in > output;
-  cat output;
+  ./bin/$1 < $1.in > $1.run;
+  cat $1.run;
   echo "----- Diff -----";
-  diff output sample.out;
-  rm output;
+  diff $1.run $1.out;
+  rm $1.run;
 fi;
 
