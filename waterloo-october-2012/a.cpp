@@ -76,6 +76,10 @@ pii dijkstra(adj const & adjacency, int source, int destination) {
       pib const & neighbor = adjacency[current][j];
       int next = neighbor.fi;
 
+      if(visited[next]) {
+        continue;
+      }
+
       pii alt = cost[current];
       // If this edge passes through outside
       alt.fi += (neighbor.se.se ? neighbor.se.fi : 0);
