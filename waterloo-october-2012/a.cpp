@@ -20,18 +20,19 @@ using namespace std;
 // Maximum value for the cost
 #define INF (1<<30)
 // Edge: (to, (cost, isInside))
-#define pib pair<int, pair<int, bool> >
+#define pib pair<int, pair<long, bool> >
 // Node: (index, (time spend outside, total time spent))
-#define node pair<int, pii>
+#define pll pair<ll, ll>
+#define node pair<int, pll>
 // Adjacency list
 #define adj vector<vector<pib> >
 
-#define NOT_FOUND pii(-1, -1)
+#define NOT_FOUND pll(INF, INF)
 
 /**
  * Custom priority ordering: cheapest nodes first
  */
-bool isBetter(pii const & a, pii const & b) {
+bool isBetter(pll const & a, pll const & b) {
   // Always use the least "outside" cost
   return (a.fi < b.fi) || (a.fi == b.fi && a.se < b.se);
 }
@@ -50,11 +51,11 @@ struct comparator {
  * @return A pair (time spent inside, total length of the shortest path)
  *         or (-1, -1) if no path exists.
  */
-pii dijkstra(adj const & adjacency, int source, int destination) {
+pll dijkstra(adj const & adjacency, int source, int destination) {
   int n = adjacency.size();
   bool visited[n];
   // Cost: (time spent outside, total time spent)
-  vector<pii> cost;
+  vector<pll> cost;
   priority_queue<node, vector<node>, comparator> q;
 
   FOR(i, n) {
@@ -76,11 +77,10 @@ pii dijkstra(adj const & adjacency, int source, int destination) {
       pib const & neighbor = adjacency[current][j];
       int next = neighbor.fi;
 
-      if(visited[next]) {
+      if(visited[next])
         continue;
-      }
 
-      pii alt = cost[current];
+      pll alt = cost[current];
       // If this edge passes through outside
       alt.fi += (neighbor.se.se ? neighbor.se.fi : 0);
       alt.se += neighbor.se.fi;
@@ -107,8 +107,8 @@ int main () {
     adjacency.pb(vector<pib>());
   }
 
-  // TODO: change cost to `long long` if values may be too large
-  int from, to, cost;
+  int from, to;
+  ll cost;
   char position;
   FOR(i, m) {
     cin >> from >> to >> cost >> position;
@@ -123,7 +123,7 @@ int main () {
   FOR(i, nTrips) {
     cin >> source >> destination;
 
-    pii result = dijkstra(adjacency, source, destination);
+    pll result = dijkstra(adjacency, source, destination);
 
     if(result == NOT_FOUND) {
       cout << "IMPOSSIBLE" << endl;
