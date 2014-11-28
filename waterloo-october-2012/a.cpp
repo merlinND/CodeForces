@@ -22,7 +22,7 @@ using namespace std;
 // Edge: (to, (cost, isInside))
 #define pib pair<int, pair<int, bool> >
 // Node: (index, (time spend outside, total time spent))
-#define node pii
+#define node pair<int, pii>
 // Adjacency list
 #define adj vector<vector<pib> >
 
@@ -31,9 +31,17 @@ using namespace std;
 /**
  * Custom priority ordering: cheapest nodes first
  */
+bool isBetter(pii const & a, pii const & b) {
+  // Always use the least "outside" cost
+  return (a.fi < b.fi) || (a.fi == b.fi && a.se < b.se);
+}
 struct comparator {
-  bool operator() (pii const & a, pii const & b) {
-    return a.se > b.se;
+  inline bool operator() (node const & a, node const & b) {
+    // cout << "Comparing " << a.fi << " against " << b.fi << endl;
+    if(isBetter(a.se, b.se))
+      return false;
+    else
+      return (a.fi < b.fi);
   }
 };
 
@@ -45,18 +53,17 @@ struct comparator {
 pii dijkstra(adj const & adjacency, int source, int destination) {
   int n = adjacency.size();
   bool visited[n];
-  // TODO: take into account outside cost
-  int cost[n];
-  // TODO: custom comparator
-  priority_queue<pii> q;
+  // Cost: (time spent outside, total time spent)
+  vector<pii> cost;
+  priority_queue<node, vector<node>, comparator> q;
 
   FOR(i, n) {
     visited[i] = false;
-    cost[i] = INF;
+    cost.pb(mp(INF, INF));
   }
 
-  q.push(mp(source, 0));
-  cost[source] = 0;
+  q.push(mp(source, mp(0, 0)));
+  cost[source] = mp(0, 0);
 
   while(!q.empty()) {
     int current = q.top().fi;
@@ -65,27 +72,25 @@ pii dijkstra(adj const & adjacency, int source, int destination) {
     if(visited[current])
       continue;
 
-    // cout << "Visiting " << current << endl;
-    visited[current] = true;
-
     FOR(j, SZ(adjacency[current])) {
       pib const & neighbor = adjacency[current][j];
       int next = neighbor.fi;
-      // cout << "Considering " << current << " -> " << next << " cost: " << neighbor.se.fi << endl;
 
-      if(visited[next])
-        continue;
+      pii alt = cost[current];
+      // If this edge passes through outside
+      alt.fi += (neighbor.se.se ? neighbor.se.fi : 0);
+      alt.se += neighbor.se.fi;
 
-      int alt = cost[current] + neighbor.se.fi;
-      if(alt < cost[next]) {
+      if(isBetter(alt, cost[next])) {
         cost[next] = alt;
         q.push(mp(next, cost[next]));
       }
     }
+
+    visited[current] = true;
   }
 
-  // TODO: return best cost found
-  return mp(cost[destination], -1);
+  return mp(cost[destination].fi, cost[destination].se);
 }
 
 int main () {
@@ -100,12 +105,12 @@ int main () {
 
   // TODO: change cost to `long long` if values may be too large
   int from, to, cost;
-  char isInside;
+  char position;
   FOR(i, m) {
-    cin >> from >> to >> cost >> isInside;
+    cin >> from >> to >> cost >> position;
 
-    adjacency[from].pb( mp(to, mp(cost, (isInside == 'I'))) );
-    adjacency[to].pb( mp(from, mp(cost, (isInside == 'I'))) );
+    adjacency[from].pb( mp(to, mp(cost, (position == 'O'))) );
+    adjacency[to].pb( mp(from, mp(cost, (position == 'O'))) );
   }
 
   // We have `nTrips` queries to answer
