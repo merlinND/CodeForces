@@ -12,21 +12,23 @@ bool breakTie(vector<ll> const & points1, vector<ll> const & points2) {
 
   if(total1 == total2) {
     // Tie-breaker: lexicographical order of the sequence of points
-    if(points1.size() != points2.size()) {
-      int i = 0;
-      while(i < min(n1, n2)) {
-        if(points1[i] == points2[i]) {
-          i++;
-          continue;
-        }
+    int i = 0;
+    while(i < min(n1, n2)) {
+      if(points1[i] != points2[i]) {
         // Found a lexicographical difference
         return (points1[i] > points2[i]);
       }
 
-      // Different sizes but one is prefix of the other:
-      // the lexicographically larger is the longest of the two
+      // Otherwise, keep trying
+      i++;
+    }
+
+    // A sequence is a prefix of the other
+    // The lexicographically larger is the longest of the two
+    if(n1 != n2) {
       return (n1 > n2);
     }
+
     // Tie-breaker-breaker: latest move
     return (latest1 > latest2);
   }
@@ -41,6 +43,9 @@ int main() {
 
   ll score;
   vector<ll> points1, points2;
+
+  total1 = 0;
+  total2 = 0;
   for(int i = 0; i < n; ++i) {
     cin >> score;
 
@@ -52,8 +57,8 @@ int main() {
     }
     // Second wrestler
     else {
-      points2.push_back(score);
       score = - score;
+      points2.push_back(score);
       total2 += score;
       latest2 = i;
     }
