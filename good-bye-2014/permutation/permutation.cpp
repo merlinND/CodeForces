@@ -18,28 +18,33 @@ bool canSwap(vector<vb> const & allowed, int source, int destination) {
   // Still, we might find a path (using transitivity of swaps)
   // Explore using breadth-first search
   int n = allowed.size();
-  vb visited;
+  vb seen;
   for(int i = 0; i < n; ++i) {
-    visited.push_back(false);
+    seen.push_back(false);
   }
 
   queue<int> candidates;
   candidates.push(source);
-  int current = source;
-  while(current != destination && !candidates.empty()) {
-    int current = candidates.front();
+  int current;
+  while(!candidates.empty()) {
+    current = candidates.front();
     candidates.pop();
-    visited[current] = true;
+    seen[current] = true;
+
+    if(current == destination) {
+      return true;
+    }
 
     // Add neighbors
     for(int j = 0; j < n; ++j) {
-      if(allowed[current][j] && !visited[j]) {
+      if(allowed[current][j] && !seen[j]) {
         candidates.push(j);
+        seen[j] = true;
       }
     }
   }
 
-  return visited[destination];
+  return false;
 }
 
 int main() {
