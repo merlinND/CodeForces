@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <queue>
 using namespace std;
 
 #define MAX_NODES 101
@@ -9,6 +10,44 @@ using namespace std;
 #define vi vector<int>
 #define adj vector<vi>
 #define mcg map<int, adj>
+
+bool pathExists(adj const & graph, int source, int destination) {
+  // Breadth-first search
+  bool visited[MAX_NODES];
+  queue<int> q;
+
+  // Init
+  for(int i = 0; i < MAX_NODES; ++i) {
+    visited[i] = false;
+  }
+  visited[source] = true;
+  q.push(source);
+
+  int current;
+  while(!q.empty()) {
+    current = q.front();
+    q.pop();
+
+    if(current == destination) {
+      return true;
+    }
+
+    for(int i = 0; i < graph[current].size(); ++i) {
+      // For each new neighbor
+      int neighbor = graph[current][i];
+      if(!visited[neighbor]) {
+        if(neighbor == destination) {
+          return true;
+        }
+
+        visited[neighbor] = true;
+        q.push(neighbor);
+      }
+    }
+  }
+
+  return false;
+}
 
 int main() {
   int n, m;
@@ -28,7 +67,7 @@ int main() {
       colors.insert(color);
 
       adj graph;
-      // Initialize a new adjacency matrix
+      // Initialize a new adjacency list
       for(int x = 0; x < MAX_NODES; ++x) {
         vi edges;
         graph.push_back(edges);
@@ -51,10 +90,9 @@ int main() {
 
     // For each color available, try to find a path
     for(set<int>::iterator it = colors.begin(); it != colors.end(); ++it) {
-      cout << source << " -> " << destination << " in colors " << (*it) << "?" << endl;
-      // if(pathExists(graph, source, destination)) {
-      //   r++;
-      // }
+      if(pathExists(graphs[*it], source, destination)) {
+        r++;
+      }
     }
 
     cout << r << endl;
