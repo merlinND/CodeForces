@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 using namespace std;
 
 bool isPalindrome(string const & s) {
