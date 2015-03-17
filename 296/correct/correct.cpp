@@ -29,6 +29,10 @@ ll trySwap(string a, string b, ll i, ll j) {
   return hammingDistance(a, b);
 }
 
+void printResults(ll finalDistance, ll pos1 = -2, ll pos2 = -2) {
+  cout << finalDistance << endl << (pos1+1) << " " << (pos2+1) << endl;
+}
+
 int main() {
   ll length;
   string first, second;
@@ -38,28 +42,40 @@ int main() {
   // Find the single swap in `first`
   // which minimizes its hamming distance to `second`
   vector<ll> differences = getDifferences(first, second);
-  ll minDistance = differences.size();
+  ll initialDistance = hammingDistance(first, second);
+  ll minDistance = initialDistance;
   ll pos1 = -2, pos2 = -2;
 
-  if(minDistance > 1) {
-    // Try each swap among the differences
-    // (there's no sense swapping letters which are in place)
-    vector<ll>::iterator diff1, diff2;
-    for(diff1 = differences.begin(); diff1 != differences.end(); ++diff1) {
-      for(diff2 = diff1; diff2 != differences.end(); ++diff2) {
-        ll i = (*diff1);
-        ll j = (*diff2);
-        ll d = trySwap(first, second, i, j);
-        // cout << d << ", " << i << " " << j << endl;
-        if(a[i] != b[j] && d < minDistance) {
-          minDistance = d;
-          pos1 = i;
-          pos2 = j;
-        }
+  if(minDistance <= 1) {
+    printResults(minDistance);
+    return 0;
+  }
+
+
+  // Try each swap among the differences
+  // (there's no sense swapping letters which are in place)
+  vector<ll>::iterator diff1, diff2;
+  for(diff1 = differences.begin(); diff1 != differences.end(); ++diff1) {
+    for(diff2 = diff1; diff2 != differences.end(); ++diff2) {
+      ll i = (*diff1);
+      ll j = (*diff2);
+      ll d = trySwap(first, second, i, j);
+      // cout << d << ", " << i << " " << j << endl;
+      if(first[i] != first[j] && d < minDistance) {
+        minDistance = d;
+        pos1 = i;
+        pos2 = j;
+      }
+
+      // We know there's no way to get better than a -2 improvement
+      // with a single swap
+      if(minDistance <= initialDistance - 2) {
+        printResults(minDistance, pos1, pos2);
+        return 0;
       }
     }
   }
 
-  cout << minDistance << endl << (pos1+1) << " " << (pos2+1) << endl;
+  printResults(minDistance, pos1, pos2);
   return 0;
 }
