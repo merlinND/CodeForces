@@ -27,14 +27,6 @@ ll hammingDistance(string a, string b) {
   return distance;
 }
 
-ll trySwap(string a, string b, ll i, ll j, ll distance) {
-  swap(a[i], a[j]);
-  // Distance can only improve by 0, 1 or 2
-  if(a[i] == b[i]) distance--;
-  if(a[j] == b[j]) distance--;
-  return distance;
-}
-
 void printResults(ll finalDistance, ll pos1 = -2, ll pos2 = -2) {
   cout << finalDistance << endl << (pos1+1) << " " << (pos2+1) << endl;
 }
@@ -48,15 +40,16 @@ int main() {
   // Objective: find the single swap in `first`
   // which minimizes its hamming distance to `second`
   ll initialDistance = hammingDistance(first, second);
+  ll minDistance = initialDistance;
 
   // We can't improve using a swap if there are less that 2 wrong letters
-  if(initialDistance <= 1) {
-    printResults(initialDistance);
+  if(minDistance <= 1) {
+    printResults(minDistance);
     return 0;
   }
 
   // Try collecting one or two 'wrong' letters which are desired elsewere
-  ll pos1 = -1, pos2 = -1;
+  ll pos1 = -2, pos2 = -2;
   differences_t differences = getDifferences(first, second);
 
   differences_t::iterator it, range, rangeEnd;
@@ -72,14 +65,17 @@ int main() {
     rangeEnd = pIt.second;
 
     if(range != rangeEnd) {
+      minDistance = initialDistance - 1;
       // Cool, now check if any of these candidates
       // actually are waiting for the letter we have available
       do {
         pos1 = range->second;
-        if(second[range->second] == available) {
+        pos2 = it->second;
+
+        char desiredThere = second[range->second];
+        if(desiredThere == available) {
           // We know there's no way to get better than a -2 improvement
           // with a single swap
-          pos2 = it->second;
           printResults(initialDistance - 2, pos1, pos2);
           return 0;
         }
@@ -89,18 +85,7 @@ int main() {
     }
   }
 
-  // We still found at least one useful letter, swap it with any other
-  if(pos1 >= 0) {
-    differences_t::iterator it = differences.begin();
-    do {
-      pos2 = it->second;
-      it++;
-    } while(pos2 == pos1);
-
-    printResults(initialDistance - 1, pos1, pos2);
-    return 0;
-  }
-
-  printResults(initialDistance);
+  // We still found at least one useful letter
+  printResults(minDistance, pos1, pos2);
   return 0;
 }
