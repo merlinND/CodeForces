@@ -1,24 +1,25 @@
 #include <iostream>
-#include <vector>
+#include <set>
 #include <algorithm>
 using namespace std;
 
 typedef long long ll;
-typedef pair<long, long> pll;
+typedef pair<ll, ll> pll;
 
 void printArea(pll const & vertical, pll const & horizontal) {
   cout << (vertical.second - vertical.first)
         * (horizontal.second - horizontal.first) << endl;
 }
 
-void updateLargestInterval(vector<ll> & cuts, pll & bestInterval) {
+void updateLargestInterval(set<ll> & cuts, pll & bestInterval) {
   ll best = 0;
-  sort(cuts.begin(), cuts.end());
-
-  for(size_t i = 1; i < cuts.size(); ++i) {
-    if(cuts[i] - cuts[i-1] >= best) {
-      bestInterval.first = cuts[i-1];
-      bestInterval.second = cuts[i];
+  // Set elements are traversed in sorted order
+  set<ll>::const_iterator it = cuts.begin(), it2 = it;
+  it2++;
+  for(; it2 != cuts.end(); ++it, ++it2) {
+    if((*it2) - (*it) >= best) {
+      bestInterval.first = (*it);
+      bestInterval.second = (*it2);
       best = (bestInterval.second - bestInterval.first);
     }
   }
@@ -33,16 +34,16 @@ int main() {
 
   char type;
   ll point;
-  vector<ll> vCuts, hCuts;
-  vCuts.push_back(vBest.first);
-  vCuts.push_back(vBest.second);
-  hCuts.push_back(hBest.first);
-  hCuts.push_back(hBest.second);
+  set<ll> vCuts, hCuts;
+  vCuts.insert(vBest.first);
+  vCuts.insert(vBest.second);
+  hCuts.insert(hBest.first);
+  hCuts.insert(hBest.second);
   for(ll i = 0; i < n; ++i) {
     // For each new cut, update the best area
     cin >> type >> point;
     if(type == 'V') {
-      vCuts.push_back(point);
+      vCuts.insert(point);
       // Affected our best area
       if(point > vBest.first && point < vBest.second) {
         // Need to find the new best vertical interval
@@ -50,7 +51,7 @@ int main() {
       }
     }
     else {
-      hCuts.push_back(point);
+      hCuts.insert(point);
       // Affected our best area
       if(point > hBest.first && point < hBest.second) {
         // Need to find the new best vertical interval
