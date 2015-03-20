@@ -5,16 +5,19 @@ using namespace std;
 typedef long long ll;
 /** Multimap (a wrong letter -> its position) */
 typedef multimap<char, ll> differences_t;
+/** Multimap ((a wrong letter, the expected letter) -> position the wrong letter) */
+typedef multimap<pair<char, char>, ll> expectations_t;
 
+differences_t differences;
+expectations_t expectations;
 
-differences_t getDifferences(string a, string b) {
-  differences_t differences;
+void precompute(string a, string b) {
   for(size_t i = 0; i < a.length(); ++i) {
     if(a[i] != b[i]) {
       differences.insert(make_pair<>(a[i], i));
+      expectations.insert(make_pair<>(make_pair<>(a[i], b[i]), i));
     }
   }
-  return differences;
 }
 
 ll hammingDistance(string a, string b) {
@@ -50,38 +53,34 @@ int main() {
 
   // Try collecting one or two 'wrong' letters which are desired elsewere
   ll pos1 = -2, pos2 = -2;
-  differences_t differences = getDifferences(first, second);
+  precompute(first, second);
 
-  differences_t::iterator it, range, rangeEnd;
-  pair<differences_t::iterator, differences_t::iterator> pIt;
+  differences_t::iterator it, other;
+  expectations_t::iterator back;
+
   for(it = differences.begin(); it != differences.end(); ++it) {
     // At this position, what we have VS what we would like
     char available = it->first;
     char desired = second[it->second];
 
     // See if this desired letter is available among the other candidates
-    pIt = differences.equal_range(desired);
-    range = pIt.first;
-    rangeEnd = pIt.second;
+    other = differences.find(desired);
 
-    if(range != rangeEnd) {
+    if(other != differences.end()) {
       minDistance = initialDistance - 1;
+      pos1 = it->second;
+      pos2 = other->second;
+
       // Cool, now check if any of these candidates
       // actually are waiting for the letter we have available
-      do {
-        pos1 = range->second;
-        pos2 = it->second;
-
-        char desiredThere = second[range->second];
-        if(desiredThere == available) {
-          // We know there's no way to get better than a -2 improvement
-          // with a single swap
-          printResults(initialDistance - 2, pos1, pos2);
-          return 0;
-        }
-
-        range++;
-      } while(range != rangeEnd);
+      back = expectations.find(make_pair<>(desired, available));
+      if(back != expectations.end()) {
+        // We know there's no way to get better than a -2 improvement
+        // with a single swap
+        pos2 = back->second;
+        printResults(initialDistance - 2, pos1, pos2);
+        return 0;
+      }
     }
   }
 
