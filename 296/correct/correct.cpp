@@ -1,17 +1,23 @@
 #include <iostream>
-#include <vector>
+#include <map>
 using namespace std;
 
 typedef long long ll;
+/** Multimap (a wrong letter -> its position) */
+typedef multimap<char, ll> differences_t;
+/** Multimap ((a wrong letter, the expected letter) -> position the wrong letter) */
+typedef multimap<pair<char, char>, ll> expectations_t;
 
-vector<ll> getDifferences(string a, string b) {
-  vector<ll> differences;
+differences_t differences;
+expectations_t expectations;
+
+void precompute(string a, string b) {
   for(size_t i = 0; i < a.length(); ++i) {
     if(a[i] != b[i]) {
-      differences.push_back(i);
+      differences.insert(make_pair<>(a[i], i));
+      expectations.insert(make_pair<>(make_pair<>(a[i], b[i]), i));
     }
   }
-  return differences;
 }
 
 ll hammingDistance(string a, string b) {
@@ -24,11 +30,6 @@ ll hammingDistance(string a, string b) {
   return distance;
 }
 
-ll trySwap(string a, string b, ll i, ll j) {
-  swap(a[i], a[j]);
-  return hammingDistance(a, b);
-}
-
 void printResults(ll finalDistance, ll pos1 = -2, ll pos2 = -2) {
   cout << finalDistance << endl << (pos1+1) << " " << (pos2+1) << endl;
 }
@@ -39,43 +40,51 @@ int main() {
   cin >> length;
   cin >> first >> second;
 
-  // Find the single swap in `first`
+  // Objective: find the single swap in `first`
   // which minimizes its hamming distance to `second`
-  vector<ll> differences = getDifferences(first, second);
   ll initialDistance = hammingDistance(first, second);
   ll minDistance = initialDistance;
-  ll pos1 = -2, pos2 = -2;
 
+  // We can't improve using a swap if there are less that 2 wrong letters
   if(minDistance <= 1) {
     printResults(minDistance);
     return 0;
   }
 
+  // Try collecting one or two 'wrong' letters which are desired elsewere
+  ll pos1 = -2, pos2 = -2;
+  precompute(first, second);
 
-  // Try each swap among the differences
-  // (there's no sense swapping letters which are in place)
-  vector<ll>::iterator diff1, diff2;
-  for(diff1 = differences.begin(); diff1 != differences.end(); ++diff1) {
-    for(diff2 = diff1; diff2 != differences.end(); ++diff2) {
-      ll i = (*diff1);
-      ll j = (*diff2);
-      ll d = trySwap(first, second, i, j);
-      // cout << d << ", " << i << " " << j << endl;
-      if(first[i] != first[j] && d < minDistance) {
-        minDistance = d;
-        pos1 = i;
-        pos2 = j;
-      }
+  differences_t::iterator it, other;
+  expectations_t::iterator back;
 
-      // We know there's no way to get better than a -2 improvement
-      // with a single swap
-      if(minDistance <= initialDistance - 2) {
-        printResults(minDistance, pos1, pos2);
+  for(it = differences.begin(); it != differences.end(); ++it) {
+    // At this position, what we have VS what we would like
+    char available = it->first;
+    char desired = second[it->second];
+
+    // See if this desired letter is available among the other candidates
+    other = differences.find(desired);
+
+    if(other != differences.end()) {
+      minDistance = initialDistance - 1;
+      pos1 = it->second;
+      pos2 = other->second;
+
+      // Cool, now check if any of these candidates
+      // actually are waiting for the letter we have available
+      back = expectations.find(make_pair<>(desired, available));
+      if(back != expectations.end()) {
+        // We know there's no way to get better than a -2 improvement
+        // with a single swap
+        pos2 = back->second;
+        printResults(initialDistance - 2, pos1, pos2);
         return 0;
       }
     }
   }
 
+  // We still found at least one useful letter
   printResults(minDistance, pos1, pos2);
   return 0;
 }

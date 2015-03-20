@@ -1,27 +1,44 @@
 #include <iostream>
-#include <vector>
+#include <map>
+#include <set>
 #include <algorithm>
 using namespace std;
 
 typedef long long ll;
-typedef pair<long, long> pll;
+typedef pair<ll, ll> pll;
+typedef ll interval_t;
+typedef map<ll, interval_t> cuts_t;
 
-void printArea(pll const & vertical, pll const & horizontal) {
-  cout << (vertical.second - vertical.first)
-        * (horizontal.second - horizontal.first) << endl;
+// Map (position of the cut) => (length of the following interval)
+cuts_t vCuts, hCuts;
+// Multisets of all available intervals
+multiset<interval_t> vIntervals, hIntervals;
+
+void printArea() {
+  multiset<interval_t>::iterator vIt = vIntervals.end(),
+                                 hIt = hIntervals.end();
+  vIt--;
+  hIt--;
+
+  cout << (*vIt) * (*hIt) << endl;
 }
 
-void updateLargestInterval(vector<ll> & cuts, pll & bestInterval) {
-  ll best = 0;
-  sort(cuts.begin(), cuts.end());
+void insertCut(cuts_t & cuts, multiset<interval_t> & intervals, ll position) {
+  // The interval being intersected becomes shorter
+  cuts_t::iterator bottom = cuts.lower_bound(position);
+  bottom--;
 
-  for(size_t i = 1; i < cuts.size(); ++i) {
-    if(cuts[i] - cuts[i-1] >= best) {
-      bestInterval.first = cuts[i-1];
-      bestInterval.second = cuts[i];
-      best = (bestInterval.second - bestInterval.first);
-    }
-  }
+  interval_t updatedInterval = (position - bottom->first);
+  interval_t newInterval = (bottom->second - updatedInterval);
+
+  // Maintain the set of available intervals
+  intervals.erase(intervals.find(bottom->second));
+  intervals.insert(updatedInterval);
+  intervals.insert(newInterval);
+
+  // Register this new cut
+  bottom->second = updatedInterval;
+  cuts[position] = newInterval;
 }
 
 int main() {
@@ -31,34 +48,22 @@ int main() {
   pll vBest(0, width);
   pll hBest(0, height);
 
+  vCuts[vBest.first] = vBest.second;
+  hCuts[hBest.first] = hBest.second;
+  vIntervals.insert(vBest.second);
+  hIntervals.insert(hBest.second);
+
   char type;
   ll point;
-  vector<ll> vCuts, hCuts;
-  vCuts.push_back(vBest.first);
-  vCuts.push_back(vBest.second);
-  hCuts.push_back(hBest.first);
-  hCuts.push_back(hBest.second);
   for(ll i = 0; i < n; ++i) {
     // For each new cut, update the best area
     cin >> type >> point;
-    if(type == 'V') {
-      vCuts.push_back(point);
-      // Affected our best area
-      if(point > vBest.first && point < vBest.second) {
-        // Need to find the new best vertical interval
-        updateLargestInterval(vCuts, vBest);
-      }
-    }
-    else {
-      hCuts.push_back(point);
-      // Affected our best area
-      if(point > hBest.first && point < hBest.second) {
-        // Need to find the new best vertical interval
-        updateLargestInterval(hCuts, hBest);
-      }
-    }
 
-    printArea(vBest, hBest);
+    cuts_t * cuts = (type == 'V' ? &vCuts : &hCuts);
+    multiset<interval_t> * intervals = (type == 'V' ? &vIntervals : &hIntervals);
+
+    insertCut(*cuts, *intervals, point);
+    printArea();
   }
   return 0;
 }
