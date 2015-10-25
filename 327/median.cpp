@@ -41,8 +41,7 @@ int main() {
     }
   } while(hasChanged);
 
-  // Particular case for the number of iterations: the sequence was stable from the start
-  cout << (iterations == 1 ? iterations - 1 : iterations) << endl;
+  cout << iterations - 1 << endl;
   if (iterations >= 0) {
     for (const bool bb : b) {
       cout << bb << " ";
