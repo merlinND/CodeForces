@@ -2,6 +2,7 @@
 #include <vector>
 
 using namespace std;
+using ll = long long int;
 
 /** Value table:
  * 0 0 0 => 0
@@ -15,7 +16,7 @@ bool median(bool b1, bool b2, bool b3) {
 }
 
 int main() {
-  int n;
+  ll n;
   cin >> n;
   vector<bool> b(n);
   bool tmp;
@@ -25,21 +26,23 @@ int main() {
   }
 
   // TODO: early exit if there is a cycle
-  long long int iterations = -1;
+  ll iterations = 0;
   // Compute median for inner terms
   bool hasChanged;
+  vector<bool> previous;
   do {
     iterations++;
+    previous = b;
     hasChanged = false;
     for (int i = 1; i < n - 1; ++i) {
-      bool m = median(b[i-1], b[i], b[i+1]);
-      hasChanged = hasChanged || (m != b[i]);
+      bool m = median(previous[i-1], previous[i], previous[i+1]);
+      hasChanged = hasChanged || (m != previous[i]);
       b[i] = m;
     }
   } while(hasChanged);
 
   // Particular case for the number of iterations: the sequence was stable from the start
-  cout << (iterations > 0 ? iterations + 1 : iterations) << endl;
+  cout << (iterations == 1 ? iterations - 1 : iterations) << endl;
   if (iterations >= 0) {
     for (const bool bb : b) {
       cout << bb << " ";
